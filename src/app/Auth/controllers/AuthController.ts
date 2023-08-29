@@ -8,7 +8,7 @@ class AuthController {
         const { email, password } = req.body
 
         try {
-            
+
             const { user, token } = await new AuthService().signIn(email, password)
             return res.status(200).json({ user, token })
 
@@ -18,8 +18,6 @@ class AuthController {
 
             return res.status(500).json({ error})
         }
-
-        return res.status(200).json({ message: 'Hello World'})
     }
 
     async destroy() {}

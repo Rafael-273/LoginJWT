@@ -2,6 +2,8 @@ import jwt from 'jsonwebtoken'
 
 import AuthError from "@app/Auth/exceptions/AuthError"
 
+import { getValue, setValue } from '@/lib/redis' 
+
 import config from '@/config'
 
 export default class AuthService {
@@ -33,6 +35,10 @@ export default class AuthService {
         }
     }
 
+    async signOut(token: string) {
+        await this.blacklistToken(token)
+    }
+
     async validateToken(token: string): Promise<string> {
         try {
             const decoded = jwt.verify(token, config.auth.secret) as {
@@ -44,4 +50,14 @@ export default class AuthService {
             throw new AuthError('Invalid token')
         }
     }
+
+    private async isTokenBlacklisted(token: string): Promise<boolean> {
+        const blacklistedToken = await getValue(`tokens:invalidated:${token}`)
+
+        return !!blacklistedToken
+        }
+
+        private async blacklistToken(token: string): Promise<void> {
+        await setValue(`tokens:invalidated:${token}`, true)
+        }
 }
