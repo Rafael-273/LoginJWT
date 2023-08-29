@@ -32,4 +32,16 @@ export default class AuthService {
             token,
         }
     }
+
+    async validateToken(token: string): Promise<string> {
+        try {
+            const decoded = jwt.verify(token, config.auth.secret) as {
+                id: string
+            }
+
+            return decoded.id
+        } catch (err) {
+            throw new AuthError('Invalid token')
+        }
+    }
 }
