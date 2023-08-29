@@ -41,6 +41,9 @@ export default class AuthService {
 
     async validateToken(token: string): Promise<string> {
         try {
+            if (await this.isTokenBlacklisted(token))
+                throw new AuthError('Token was blacklisted.')
+
             const decoded = jwt.verify(token, config.auth.secret) as {
                 id: string
             }
